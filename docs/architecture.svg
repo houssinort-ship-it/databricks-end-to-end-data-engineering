@@ -1,0 +1,186 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1180" viewBox="0 0 1600 1180" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#37474f"/>
+    </marker>
+    <marker id="arrowDash" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#7b8794"/>
+    </marker>
+    <filter id="shadow" x="-3%" y="-3%" width="106%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.12"/>
+    </filter>
+    <style>
+      .title  { font-size: 34px; font-weight: 700; fill: #102a43; }
+      .sub    { font-size: 17px; fill: #486581; }
+      .boxT   { font-size: 19px; font-weight: 600; fill: #102a43; }
+      .boxS   { font-size: 14px; fill: #334e68; }
+      .mono   { font-family: Consolas, monospace; font-size: 13px; fill: #243b53; }
+      .lbl    { font-size: 13px; fill: #52606d; }
+      .panelT { font-size: 17px; font-weight: 700; fill: #102a43; }
+      .panelS { font-size: 13.5px; fill: #334e68; }
+      .badge  { font-size: 12px; font-weight: 600; fill: #ffffff; }
+      .note   { font-size: 12.5px; fill: #627d98; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1180" fill="#f7f9fc"/>
+  <text class="title" x="50" y="58">Databricks + PySpark + Delta Lake + Backblaze B2 — Medallion Lakehouse</text>
+  <text class="sub" x="50" y="88">End-to-end data engineering pipeline reconstructed from “Backblaze_B2_Databricks_PySpark.pdf”</text>
+
+  <!-- ============ MAIN FLOW ============ -->
+  <g filter="url(#shadow)">
+    <rect x="90" y="120" width="820" height="86" rx="10" fill="#ffffff" stroke="#bcccdc"/>
+  </g>
+  <rect x="90" y="120" width="8" height="86" rx="4" fill="#0b7a75"/>
+  <text class="boxT" x="116" y="150">1 · CSV DATA (source systems)</text>
+  <text class="mono" x="116" y="176">clients.csv · articles.csv · commandes.csv · lignes_commandes.csv</text>
+  <text class="boxS" x="116" y="196">20 / 13 / 30 / 64 rows — documented column sets preserved</text>
+
+  <line x1="500" y1="206" x2="500" y2="238" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="240" width="820" height="82" rx="10" fill="#e8f4ff" stroke="#7fb3d5"/>
+  </g>
+  <rect x="90" y="240" width="8" height="82" rx="4" fill="#1f6fb2"/>
+  <text class="boxT" x="116" y="270">2 · Backblaze B2 — cloud object storage (S3-compatible API)</text>
+  <text class="mono" x="116" y="295">bucket: atelier8-lakehouse   endpoint: s3.eu-central-003.backblazeb2.com</text>
+  <text class="boxS" x="116" y="314">object keys (no real folders): clients.csv, articles.csv, …</text>
+
+  <line x1="500" y1="322" x2="500" y2="354" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="356" width="820" height="76" rx="10" fill="#ffffff" stroke="#bcccdc"/>
+  </g>
+  <rect x="90" y="356" width="8" height="76" rx="4" fill="#8e44ad"/>
+  <text class="boxT" x="116" y="384">Unity Catalog Volume — workspace.default.b2_raw</text>
+  <text class="mono" x="116" y="408">/Volumes/workspace/default/b2_raw</text>
+  <text class="lbl" x="470" y="408">local: data/b2_raw</text>
+
+  <line x1="500" y1="432" x2="500" y2="464" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="466" width="820" height="70" rx="10" fill="#fff8e6" stroke="#e0b252"/>
+  </g>
+  <rect x="90" y="466" width="8" height="70" rx="4" fill="#b7791f"/>
+  <text class="boxT" x="116" y="492">01_ingestion_b2 — boto3 download (prefix → Volume)</text>
+  <text class="mono" x="116" y="516">s3.download_file(bucket, key, local) · skips “/” keys · os.makedirs</text>
+
+  <line x1="500" y1="536" x2="500" y2="568" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="570" width="820" height="92" rx="10" fill="#f3f0ff" stroke="#b3a5e0"/>
+  </g>
+  <rect x="90" y="570" width="8" height="92" rx="4" fill="#6f4bd8"/>
+  <text class="boxT" x="116" y="597">3 · BRONZE — raw copy, all columns as text</text>
+  <text class="mono" x="116" y="621">workspace.bronze.bronze_clients / _articles / _commandes / _lignes_commandes</text>
+  <text class="boxS" x="116" y="642">+ _ingested_at (current_timestamp) · + _source_file (_metadata.file_path) · Delta</text>
+
+  <line x1="500" y1="662" x2="500" y2="694" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="696" width="820" height="104" rx="10" fill="#eefaf3" stroke="#86c7a8"/>
+  </g>
+  <rect x="90" y="696" width="8" height="104" rx="4" fill="#1d7a4c"/>
+  <text class="boxT" x="116" y="723">4 · SILVER — typed, cleaned, deduplicated</text>
+  <text class="mono" x="116" y="747">to_bigint · to_int · to_decimal (“12,50”) · to_date_multi (5 formats) · initcap · lower</text>
+  <text class="boxS" x="116" y="768">dedup by business key on _ingested_at desc · montant_ligne = quantite × prix_unitaire</text>
+  <rect x="676" y="710" width="216" height="34" rx="17" fill="#c0392b"/>
+  <text class="badge" x="698" y="732">QUALITY GATE (error / warn)</text>
+  <text class="boxS" x="116" y="789">14 checks: unique · not_null · relationship (left_anti) → bilan_tests() stops on ERROR</text>
+
+  <line x1="500" y1="800" x2="500" y2="832" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="834" width="820" height="104" rx="10" fill="#fff2e8" stroke="#e6a97a"/>
+  </g>
+  <rect x="90" y="834" width="8" height="104" rx="4" fill="#c05621"/>
+  <text class="boxT" x="116" y="861">5 · GOLD — business indicators (cancelled orders excluded)</text>
+  <text class="mono" x="116" y="885">gold_fact_ventes · gold_ca_mensuel · gold_ca_par_client · gold_ca_par_categorie</text>
+  <text class="boxS" x="116" y="906">fact = lines ⨝ orders ⨝ clients ⨝ articles (left) · mois = date_trunc(month, date_commande)</text>
+  <text class="boxS" x="116" y="926">CA, nb commandes, nb clients, panier moyen (CA/commandes) · all clients kept (left join)</text>
+
+  <line x1="500" y1="938" x2="500" y2="970" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="972" width="820" height="76" rx="10" fill="#e8f4ff" stroke="#7fb3d5"/>
+  </g>
+  <rect x="90" y="972" width="8" height="76" rx="4" fill="#1f6fb2"/>
+  <text class="boxT" x="116" y="1000">6 · 05_export_gold_b2 — Gold → CSV → Backblaze B2</text>
+  <text class="mono" x="116" y="1024">toPandas().to_csv(..., index=False) → s3.upload_file(local, bucket, “gold/&lt;table&gt;.csv”)</text>
+
+  <line x1="500" y1="1048" x2="500" y2="1080" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="1082" width="820" height="70" rx="10" fill="#ffffff" stroke="#bcccdc"/>
+  </g>
+  <rect x="90" y="1082" width="8" height="70" rx="4" fill="#0b7a75"/>
+  <text class="boxT" x="116" y="1110">7 · ANALYTICS — Databricks AI/BI Dashboard (SQL Warehouse)</text>
+  <text class="mono" x="116" y="1134">ds_ca_mensuel · ds_ca_categorie · ds_clients · ds_ventes</text>
+
+  <!-- ============ SIDE PANEL: DATABRICKS JOB ============ -->
+  <g filter="url(#shadow)">
+    <rect x="960" y="120" width="590" height="300" rx="12" fill="#ffffff" stroke="#bcccdc"/>
+  </g>
+  <text class="panelT" x="985" y="152">Databricks Job — task chain (step 9)</text>
+  <g font-size="13" fill="#334e68">
+    <rect x="985" y="172" width="150" height="38" rx="8" fill="#fff8e6" stroke="#e0b252"/>
+    <text x="1000" y="196">ingestion</text>
+    <rect x="985" y="230" width="150" height="38" rx="8" fill="#f3f0ff" stroke="#b3a5e0"/>
+    <text x="1000" y="254">bronze</text>
+    <rect x="985" y="288" width="150" height="38" rx="8" fill="#eefaf3" stroke="#86c7a8"/>
+    <text x="1000" y="312">silver</text>
+    <rect x="985" y="346" width="150" height="38" rx="8" fill="#fff2e8" stroke="#e6a97a"/>
+    <text x="1000" y="370">gold</text>
+    <rect x="1200" y="346" width="150" height="38" rx="8" fill="#e8f4ff" stroke="#7fb3d5"/>
+    <text x="1215" y="370">export_b2</text>
+    <line x1="1060" y1="210" x2="1060" y2="228" stroke="#7b8794" stroke-width="1.6" marker-end="url(#arrowDash)"/>
+    <line x1="1060" y1="268" x2="1060" y2="286" stroke="#7b8794" stroke-width="1.6" marker-end="url(#arrowDash)"/>
+    <line x1="1060" y1="326" x2="1060" y2="344" stroke="#7b8794" stroke-width="1.6" marker-end="url(#arrowDash)"/>
+    <line x1="1135" y1="365" x2="1198" y2="365" stroke="#7b8794" stroke-width="1.6" marker-end="url(#arrowDash)"/>
+  </g>
+  <text class="note" x="1200" y="196">Serverless compute,</text>
+  <text class="note" x="1200" y="214">“Depends on” links,</text>
+  <text class="note" x="1200" y="232">optional daily trigger.</text>
+  <text class="note" x="1200" y="268">00_config is loaded via</text>
+  <text class="note" x="1200" y="286">%run ./00_config by</text>
+  <text class="note" x="1200" y="304">02 / 03 / 04.</text>
+  <text class="note" x="985" y="405">Fail-fast: a blocking quality ERROR stops the chain before Gold is rebuilt.</text>
+
+  <!-- ============ SIDE PANEL: LOCAL ============ -->
+  <g filter="url(#shadow)">
+    <rect x="960" y="440" width="590" height="382" rx="12" fill="#ffffff" stroke="#bcccdc"/>
+  </g>
+  <text class="panelT" x="985" y="472">Local execution (this repository)</text>
+  <text class="panelS" x="985" y="500">• Apache Spark 4.0.1 + Delta Lake 4.0.0 (pip), Java 17/21, Python 3.11</text>
+  <text class="panelS" x="985" y="524">• <tspan font-family="Consolas, monospace">python -m de_b2_lakehouse.run_pipeline all</tspan></text>
+  <text class="panelS" x="985" y="548">• Same 3-part table names; catalog level emulated (workspace.bronze.t → bronze.t)</text>
+  <text class="panelS" x="985" y="572">• Volume → data/b2_raw · Delta warehouse → spark-warehouse/</text>
+  <text class="panelS" x="985" y="596">• <tspan font-family="Consolas, monospace">--store local</tspan> → LocalObjectStore · <tspan font-family="Consolas, monospace">--store b2</tspan> → boto3</text>
+  <text class="panelS" x="985" y="620">• Credentials from .env (B2_KEY_ID, B2_APP_KEY…) — never committed</text>
+  <text class="panelS" x="985" y="644">• Unit tests: cleaning, dates, dedup, quality gates, gold totals</text>
+  <line x1="985" y1="662" x2="1525" y2="662" stroke="#d9e2ec"/>
+  <text class="panelT" x="985" y="686">Requires Databricks (not reproduced locally)</text>
+  <text class="panelS" x="985" y="712">• Unity Catalog governance + Lineage tab</text>
+  <text class="panelS" x="985" y="736">• Volumes, serverless compute, Workflows scheduling</text>
+  <text class="panelS" x="985" y="760">• AI/BI Dashboard &amp; SQL Warehouse</text>
+  <text class="panelS" x="985" y="784">• information_schema catalog queries</text>
+  <text class="note" x="985" y="808">These are documented, not simulated: see docs/LOCAL_LIMITATIONS.md.</text>
+
+  <!-- ============ SIDE PANEL: SECURITY ============ -->
+  <g filter="url(#shadow)">
+    <rect x="960" y="846" width="590" height="306" rx="12" fill="#fdf6f6" stroke="#e3b4b4"/>
+  </g>
+  <text class="panelT" x="985" y="878">Security &amp; data contract</text>
+  <text class="panelS" x="985" y="906">• B2 application key scoped to one bucket (PDF step 3)</text>
+  <text class="panelS" x="985" y="930">• Secrets: env vars locally, Databricks secret scope on the workspace</text>
+  <text class="panelS" x="985" y="954">• .env ignored by git · .env.example holds placeholders only</text>
+  <text class="panelS" x="985" y="978">• Typed parsing cannot crash the job (try_cast → NULL)</text>
+  <text class="panelS" x="985" y="1002">• Referential checks catch orphan orders/articles before Gold</text>
+  <text class="panelS" x="985" y="1026">• Inputs are synthetic sample data; no personal data in the repo</text>
+  <text class="panelS" x="985" y="1050">• Export uses toPandas() on small aggregates only</text>
+  <text class="note" x="985" y="1080">Rotate B2 keys immediately if a secret is ever committed.</text>
+  <text class="note" x="985" y="1104">See SECURITY.md for the audit procedure.</text>
+
+  <!-- footer -->
+  <text class="note" x="50" y="1170">Source: Backblaze_B2_Databricks_PySpark.pdf (59 pages) · notebooks 00_config → 05_export_gold_b2 · diagrams/docs generated for the local reconstruction</text>
+</svg>

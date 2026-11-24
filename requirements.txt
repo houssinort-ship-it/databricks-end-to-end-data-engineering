@@ -1,0 +1,9 @@
+# The notebooks run on Databricks: these libraries are already provided by the
+# cluster (no installation needed in the workspace).
+#
+# They are listed here so you can replay the pipeline outside Databricks with
+# the same versions:
+pyspark==4.0.1
+delta-spark==4.0.0
+boto3>=1.34,<2
+pandas>=2.2,<3

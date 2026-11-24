@@ -1,0 +1,3 @@
+# Extra libraries installed inside the Databricks notebooks.
+# Spark, Delta and pandas are already provided by the runtime.
+boto3>=1.34,<2

@@ -1,0 +1,33 @@
+%% Databricks + PySpark + Delta Lake + Backblaze B2 medallion pipeline
+%% Source: Backblaze_B2_Databricks_PySpark.pdf (Atelier Big Data -4)
+flowchart TD
+    CSV["CSV sources<br/>clients.csv · articles.csv<br/>commandes.csv · lignes_commandes.csv"]
+    B2RAW["Backblaze B2 bucket<br/>S3-compatible endpoint<br/>atelier8-lakehouse"]
+    VOL["Unity Catalog Volume<br/>workspace.default.b2_raw<br/>/Volumes/workspace/default/b2_raw"]
+    ING["01_ingestion_b2<br/>boto3 download_file(prefix → Volume)"]
+
+    subgraph DATABRICKS["Databricks serverless / local Spark 4.0 + Delta Lake 4.0"]
+        BRONZE["BRONZE — workspace.bronze.*<br/>raw text + _ingested_at + _source_file"]
+        SILVER["SILVER — workspace.silver.*<br/>typing, cleaning, dedup, montant_ligne"]
+        DQ{"Quality checks<br/>unique · not_null · relationship"}
+        GOLD["GOLD — workspace.gold.*<br/>gold_fact_ventes<br/>gold_ca_mensuel<br/>gold_ca_par_client<br/>gold_ca_par_categorie"]
+        EXP["05_export_gold_b2<br/>toPandas().to_csv + upload_file"]
+    end
+
+    B2GOLD["Backblaze B2<br/>gold/&lt;table&gt;.csv"]
+    DASH["AI/BI Dashboard<br/>SQL Warehouse<br/>ds_ca_mensuel · ds_ca_categorie<br/>ds_clients · ds_ventes"]
+
+    CSV --> B2RAW --> VOL --> ING --> BRONZE --> SILVER --> DQ
+    DQ -- "ERROR → stop" --> STOP["Job fails<br/>(Gold not rebuilt)"]
+    DQ -- "OK / WARN" --> GOLD --> EXP --> B2GOLD
+    GOLD --> DASH
+
+    JOB["Databricks Job<br/>ingestion → bronze → silver → gold → export_b2"] -.-> ING
+    JOB -.-> BRONZE
+    JOB -.-> SILVER
+    JOB -.-> GOLD
+    JOB -.-> EXP
+
+    CFG["00_config<br/>parameters + shared functions<br/>(%run ./00_config)"] -.-> BRONZE
+    CFG -.-> SILVER
+    CFG -.-> GOLD

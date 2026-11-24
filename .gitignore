@@ -1,0 +1,33 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+
+# Local Spark / Delta state
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+
+# Windows Hadoop helper (downloaded, not versioned)
+.tools/
+
+# Local emulation of the Unity Catalog Volume (sample inputs are in data/csv/)
+data/b2_raw/
+data/b2_lakehouse/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
